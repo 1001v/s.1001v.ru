@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html ng-app="ShortApp">
+
+<head>
+    <title>Сгенерить короткую ссылку</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.0/rzslider.min.css" />
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+</head>
+
+<body ng-cloak ng-controller="mainCtrl">
+
+
+    <div class="container container-table">
+        <div class="row vertical-center-row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3>Сделать короткую ссылку</h3>
+                    </div>
+                    <div class="panel-body">
+                        <h4>Ссылка для сокращения</h4>
+                        <div class="input-group">
+                            <input ng-model="data.href" placeholder="Ссылка" type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button ng-click="create()" class="btn btn-primary" ng-class="{disabled: !data.href}" type="button">Сократить</button>
+                            </span>
+                        </div>
+                        <h4>Секретное слово</h4>
+                        <div class="form-group">
+                            <input ng-model="data.secret" placeholder="Будет добавлено к ссылке (опционально)" type="text" class="form-control">
+                        </div>
+                        <h4>Время жизни ссылки (часы)</h4>
+                        <div>
+                            <rzslider rz-slider-model="data.expire"></rzslider>
+                        </div>
+                        <h4>Лимит просмотров ссылки</h4>
+                        <div>
+                            <rzslider rz-slider-model="data.count"></rzslider>
+                        </div>
+                        <hr>
+                        <h4>Сокращенная ссылка</h4>
+                        <div class="input-group">
+                            <input id="result" ng-model="result" readonly placeholder="Появится тут" type="text" class="form-control">
+                            <span class="input-group-btn">
+                                <button ng-click="cop()" class="btn btn-success" type="button">Скопировать</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript " src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js "></script>
+    <script type="text/javascript " src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-animate.min.js "></script>
+    <script type="text/javascript " src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular-touch.min.js "></script>
+    <script type="text/javascript " src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.1.3/ui-bootstrap-tpls.min.js "></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-clipboard/1.5.0/angular-clipboard.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.0/rzslider.min.js"></script>
+    <script type="text/javascript ">
+        var app = angular.module('ShortApp', ['ui.bootstrap', 'rzModule', 'angular-clipboard']);
+
+        app.controller("mainCtrl", function($scope, $http, clipboard) {
+            $scope.data = {
+                expire: 1000,
+                count: 1000,
+                href: '',
+                secret: ''
+            };
+
+            $scope.result = '';
+
+
+            $scope.copy = function() {
+                if (clipboard.supported)
+                    clipboard.copyText($scope.result);
+            }
+
+
+            $scope.create = function() {
+                $http.post('/generate', $scope.data)
+                    .then(function(response) {
+                        if (response.data.created) {
+                            $scope.result = "http://" + window.location.host + "/" + response.data.created;
+                            $scope.data.href = "";
+                            $scope.data.secret = "";
+                            setTimeout(function() {
+                                document.getElementById("result").select();
+                            }, 300);
+                        } else {
+                            throw new Error("Какая-то ошибка");
+                        }
+
+
+                    }).catch(function() {
+                        $scope.result = "Какая-то ошибка";
+
+                    });
+
+            }
+
+        });
+    </script>
+
+
+</body>
+
+</html>

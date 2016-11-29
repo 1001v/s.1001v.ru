@@ -1,0 +1,33 @@
+[ng\:cloak],
+[ng-cloak],
+.ng-cloak {
+    display: none !important;
+}
+
+html,
+body,
+.container-table {
+    height: 100%;
+}
+
+.container-table {
+    display: table;
+}
+
+.vertical-center-row {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.rz-slider,
+.rz-pointer {
+    background-color: #337ab7 !important;
+}
+
+.rz-pointer {
+    outline: none !important;
+}
+
+.rz-active:after {
+    background-color: white !important;
+}
